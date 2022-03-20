@@ -11,17 +11,34 @@ public class PlayerBall : MonoBehaviour
     bool isJump;
     Rigidbody rigid;
 
+    private float moveSpeed = 20.0f;    //이동속도(z축)
+    private float rotateSpeed = 300.0f;  //회전속도
+
     void Awake()
     {
         isJump = false;
         rigid = GetComponent<Rigidbody>();
     }
-    void Update() {
-        if (Input.GetButtonDown("Jump") && !isJump) {
+
+    public GameObject targetPosition;
+    //targetPosition = GameObject.FindWithTag("Item");
+    //Vector3 target = new Vector3(Component.tag.Item);
+    void Update()
+    {
+       //z축이동
+        //transform.position += Vector3.MoveTowards(transform.position, Vector3, 0.1f) * moveSpeed * Time.deltaTime;
+        transform.position = Vector3.MoveTowards(gameObject.transform.position, GameObject.FindWithTag("Item").transform.position, 0.01f);
+
+        //오브젝트 회전(x축)
+        transform.Rotate(Vector3.right * rotateSpeed * Time.deltaTime);
+
+        if (Input.GetButtonDown("Jump") && !isJump)
+        {
             isJump = true;
             rigid.AddForce(new Vector3(0, jumpPower, 0), ForceMode.Impulse);
         }
     }
+
     void FixedUpdate()
     {
         float h = Input.GetAxisRaw("Horizontal");
@@ -40,8 +57,9 @@ public class PlayerBall : MonoBehaviour
         {
             itemCount++;
             GetComponent<AudioSource>().Play();
-            other.gameObject.SetActive(false);
+            //other.gameObject.SetActive(false);
             manager.GetItem(itemCount);
+            other.gameObject.tag = "ok";
         }
         else if (other.tag == "Finish")
         {
